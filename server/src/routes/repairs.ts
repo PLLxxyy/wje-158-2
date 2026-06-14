@@ -117,6 +117,9 @@ router.post('/:id/complete', authMiddleware, roleMiddleware('repairer'), upload.
   // Update facility status back to good
   db.prepare('UPDATE facilities SET status = ?, description = ? WHERE id = ?').run('good', '', order.facility_id);
 
+  // Update inspection item repaired status
+  db.prepare('UPDATE inspection_items SET repaired = 1 WHERE id = ?').run(order.inspection_item_id);
+
   res.json({ message: '维修完成' });
 });
 

@@ -50,6 +50,7 @@ export interface InspectionItem {
   result: 'good' | 'damaged' | 'missing' | null;
   damage_desc: string;
   photo: string;
+  repaired: number;
 }
 
 export interface RepairOrder {

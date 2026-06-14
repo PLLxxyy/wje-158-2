@@ -202,6 +202,19 @@ export default function InspectionCheck() {
                 {/* Damage description & photo for damaged/missing */}
                 {state?.result && state.result !== 'good' && (
                   <div style={{ marginTop: 12 }}>
+                    {isCompleted && item && (
+                      <div style={{ marginBottom: 12 }}>
+                        {item.repaired ? (
+                          <span className="badge badge-completed" style={{ background: '#2e7d32' }}>
+                            {'\u{2705}'} 已修复
+                          </span>
+                        ) : (
+                          <span className="badge badge-pending" style={{ background: '#e65100' }}>
+                            {'\u{23F3}'} 待修复
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <div className="form-group">
                       <label className="form-label">损坏描述</label>
                       <textarea
@@ -233,6 +246,12 @@ export default function InspectionCheck() {
                             </>
                           )}
                         </label>
+                      </div>
+                    )}
+                    {isCompleted && item?.photo && (
+                      <div className="form-group">
+                        <label className="form-label">损坏照片</label>
+                        <img src={item.photo} alt="损坏照片" className="photo-preview" style={{ maxWidth: 300 }} />
                       </div>
                     )}
                   </div>
@@ -268,6 +287,28 @@ export default function InspectionCheck() {
                   完成时间：{new Date(inspection.completed_at).toLocaleString()}
                 </div>
               )}
+              {items.length > 0 && (() => {
+                const damagedItems = items.filter(i => i.result === 'damaged' || i.result === 'missing');
+                const repairedCount = damagedItems.filter(i => i.repaired).length;
+                const pendingCount = damagedItems.length - repairedCount;
+                return damagedItems.length > 0 ? (
+                  <div className="mt-12" style={{ fontSize: 14 }}>
+                    <span style={{ marginRight: 16 }}>
+                      发现问题：<strong>{damagedItems.length}</strong> 项
+                    </span>
+                    <span style={{ marginRight: 16, color: '#2e7d32' }}>
+                      {'\u{2705}'} 已修复：<strong>{repairedCount}</strong> 项
+                    </span>
+                    <span style={{ color: '#e65100' }}>
+                      {'\u{23F3}'} 待修复：<strong>{pendingCount}</strong> 项
+                    </span>
+                  </div>
+                ) : (
+                  <div className="mt-12" style={{ fontSize: 14, color: '#2e7d32' }}>
+                    所有设施完好，无问题
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>

@@ -67,6 +67,7 @@ function initDatabase(): void {
       result TEXT CHECK(result IN ('good', 'damaged', 'missing')),
       damage_desc TEXT DEFAULT '',
       photo TEXT DEFAULT '',
+      repaired INTEGER NOT NULL DEFAULT 0,
       FOREIGN KEY (inspection_id) REFERENCES inspections(id),
       FOREIGN KEY (facility_id) REFERENCES facilities(id)
     );
@@ -90,6 +91,13 @@ function initDatabase(): void {
       FOREIGN KEY (facility_id) REFERENCES facilities(id)
     );
   `);
+
+  // Database migration: add repaired column to inspection_items if not exists
+  const columnInfo = db.prepare("PRAGMA table_info(inspection_items)").all() as any[];
+  const hasRepairedColumn = columnInfo.some(col => col.name === 'repaired');
+  if (!hasRepairedColumn) {
+    db.prepare("ALTER TABLE inspection_items ADD COLUMN repaired INTEGER NOT NULL DEFAULT 0").run();
+  }
 
   // Check if seed data exists
   const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number };
