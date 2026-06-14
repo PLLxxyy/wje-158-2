@@ -99,6 +99,18 @@ function initDatabase(): void {
     db.prepare("ALTER TABLE inspection_items ADD COLUMN repaired INTEGER NOT NULL DEFAULT 0").run();
   }
 
+  // Data migration: backfill repaired status from completed repair orders
+  db.prepare(`
+    UPDATE inspection_items
+    SET repaired = 1
+    WHERE id IN (
+      SELECT inspection_item_id
+      FROM repair_orders
+      WHERE status = 'completed'
+    )
+    AND repaired = 0
+  `).run();
+
   // Check if seed data exists
   const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number };
   if (userCount.count === 0) {
